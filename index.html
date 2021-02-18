@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>Parser</title>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="Frantisek Kolacek" />
+    <link href="css/font.css" rel="stylesheet" />
+    <link href="css/jquery.highlight-within-textarea.css" rel="stylesheet" />
+    <link href="css/style.css" rel="stylesheet" />
+    <link rel='shortcut icon' href='/favicon.ico' />
+  </head>
+<body>
+  <div id="wrapper">
+    <div id="data">
+      <textarea id="data-input" name="data-input">
+One small potato (potato@gmail.com) with MAC address de:ad:be:ef:23:2A went to us and created a ticket INC0011223 which contained MD5 hash 1b2862cc1f58a5f1b8c22e083230c577 and also SHA1 hash 4d8db305b713614961c71162894a263ea8ebdc82 and also IPv4 address 10.0.0.3 and 127.0.1.1 together with IPv6 dead:beaf:aaaa:aaaa:5fcb:1237:aaec:0 and also some encrypted text YWhvago= using base64
+      </textarea>
+    </div>
+    <div id="results"></div>
+  </div>
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+  <script type="text/javascript" src="js/jquery.highlight-within-textarea.js"></script>
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+      var PATTERNS = {
+        'hashes': {
+          'description': "Hashes",
+          'patterns': {
+            'md5sum': /\b[0-9a-f]{32}\b/gi,
+            'sha1sum': /\b[0-9a-f]{40}\b/gi,
+            'sha256sum': /\b[0-9a-f]{64}\b/gi
+          }
+        },
+        'ipaddresses': {
+          'description': "IP addresses",
+          'patterns': {
+            'ipv4': /\b[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\b/g,
+            'ipv6': /\b(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\b/g
+          }
+        },
+        'domains': {
+          'description': "Domains",
+          'patterns': {
+            'domain': /\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b/g
+          }
+        },
+        'urls': {
+          'description': "URLs",
+          'patterns': {
+            'url': /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g
+          }
+        },
+        'macaddresses': {
+          'description': "MAC addresses",
+          'patterns': {
+            'macaddress': /\b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b/g
+          }
+        },
+        'pi': {
+          'description': "Personal infomation",
+          'patterns': {
+            'email': /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/g
+          }
+        },
+        'services': {
+          'description': "Services",
+          'patterns': {
+            'snow': /(INC|REQ|TASK|RITM)[0-9]{7}/g
+          }
+        },
+        'encrypted': {
+          'description': "Encrypted",
+          'patterns': {
+          }
+        }
+      };
+
+  </script>
+  <script type="text/Javascript" src="js/scripts.js"></script>
+  </body>
+</html>

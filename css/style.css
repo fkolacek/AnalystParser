@@ -1,0 +1,61 @@
+*{ margin: 0; box-sizing: border-box; }
+body{ font: 17px/25px 'Droid Sans Mono', sans-serif; color: #495057; background-color: #f1f3f5; }
+
+html, body, #wrapper, #data, #results{ height: 100%; }
+#wrapper{}
+  #data{ float: left; width: 50%; }
+      #data textarea{ width: 100%; height: 100%; }
+  #results{ float: right; width: 50%; }
+
+.hwt-container { background-color: #f8f9fa; width: 100%; height: 100%; }
+.hwt-content { height: 100px; padding: 20px; xborder: 1px solid #adb5bd; color: inherit; font: 17px/25px 'Droid Sans Mono', sans-serif; }
+.hwt-input:focus { outline-color: #495057; }
+.hwt-content mark { border-radius: 3px; background-color: #d0bfff; }
+
+.mark_pi { background-color: #ffc9c9 !important; }
+.mark_macaddresses { background-color: #8f89ff !important; }
+.mark_hashes { background-color: #a3daff !important; }
+.mark_urls { background-color: #a3ffff !important; }
+.mark_services { background-color: #ffacff !important;}
+.mark_ipaddresses { background-color: #ffec99 !important; }
+.mark_domains { background-color: #00cccc !important; }
+
+
+#results{ font: 15px/25px 'Droid Sans Mono', sans-serif; }
+#results li{}
+#results a{ text-decoration: none; color: #495057;  }
+#results a:hover{ text-decoration: underline; }
+
+.collapsible {
+  background-color: #777;
+  cursor: pointer;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+.active, .collapsible:hover {
+  background-color: #555;
+}
+
+.collapsible:after {
+  content: '\002B';
+  font-weight: bold;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+  content: "\2212";
+}
+
+.content {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #f1f1f1;
+}
